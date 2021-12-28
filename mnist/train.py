@@ -7,10 +7,13 @@ import gzip, pickle, os
 import numpy as np
 import tensorflow as tf
 import argparse
+import os, psutil
 
 #limit training to 1 core
 tf.config.threading.set_intra_op_parallelism_threads(1)
 tf.config.threading.set_inter_op_parallelism_threads(1)
+
+process = psutil.Process(os.getpid())
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--batch_size', type=int, default=128, help='Batch size for training.')
@@ -80,3 +83,5 @@ model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=0, val
 
 tf.keras.backend.set_learning_phase(0)  # Ignore dropout at inference
 tf.saved_model.save(model,MODEL_DIR + str(1))
+
+print("Memory used by process: ", process.memory_info().rss)
